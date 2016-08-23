@@ -27,7 +27,7 @@ var AllSongs = React.createClass({
 
   addSong: function(ri) {
     return function() {
-      var song = this.state.songs[ri];
+	var song = allsongs[ri];
       playlist.push(song);
       allsongs = allsongs.filter((x,i)=>(i !== ri));
       this.setState({songs:allsongs});
@@ -82,7 +82,7 @@ var ApprovedSongs = React.createClass({
   },
 
   handleAdd: function (evt) {
-    if (evt.from.id !== 'playlist' ) {
+    if (evt.from.id !== 'playlist-el' ) {
       playlist.splice(evt.newIndex, 0, allsongs[evt.oldIndex]);
       allsongs = allsongs.filter((x,i)=>(i !== evt.oldIndex));
       playlistUpdate();
@@ -99,7 +99,7 @@ var ApprovedSongs = React.createClass({
   },
 
   handleSort: function (evt) {
-    if (evt.from.id === 'playlist' ) {
+    if (evt.from.id === 'playlist-el' ) {
       var old = playlist[evt.oldIndex];
       playlist = playlist.filter((x,i)=>(i !== evt.oldIndex));
       playlist.splice(evt.newIndex, 0, old);
@@ -109,8 +109,9 @@ var ApprovedSongs = React.createClass({
 
 
   componentDidMount: function() {
-    window.playlistUpdate = function() {
-      this.forceUpdate();
+      window.playlistUpdate = function(theplaylist) {
+	  this.setState({songs:playlist})
+	  this.forceUpdate();
     }.bind(this);
   },
 
@@ -143,7 +144,7 @@ var ApprovedSongs = React.createClass({
       <div><span className="line"><span className="circle"></span></span></div>
       </div>
       
-      <div ref="song"  id="playlist" >{
+      <div ref="song"  id="playlist-el" >{
 	this.state.songs.map(function ({artist, title, image}, i) {
 	  var firstlast = ((i === that.state.songs.length - 1) ? 'last' : 'notlast');
 	  
