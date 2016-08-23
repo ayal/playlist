@@ -129,11 +129,6 @@ var ApprovedSongs = React.createClass({
       playlistUpdate();
     }.bind(this)
   },
-
-  componentWillUpdate: function(np,ns) {
-    // don't allow state updates, only data
-    ns.songs = playlist;
-  },
   
   render: function() {
     var that = this;
