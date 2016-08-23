@@ -14,6 +14,7 @@ var AllSongs = React.createClass({
   mixins: [SortableMixin],
 
   sortableOptions: {
+    ghostClass: "sortable-ghost",
     ref: "song",
     group: "shared",
     animation: 400,
@@ -72,11 +73,12 @@ var playlist = [{artist: 'XXYYXX', title: 'About You', image: 'http://a4.mzstati
 
 var ApprovedSongs = React.createClass({
   mixins: [SortableMixin],
-  sortableOptions: {
-    ref: "song",
-    group: "shared",
-    animation: 400,
-    model: "songs",
+    sortableOptions: {
+      ghostClass: "sortable-ghost",
+      ref: "song",
+      group: "shared",
+      animation: 400,
+      model: "songs",
   },
 
   handleAdd: function (evt) {
