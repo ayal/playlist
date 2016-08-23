@@ -125,7 +125,7 @@ var ApprovedSongs = React.createClass({
 	return;
       }
       playlist = playlist.filter((x,i)=>(i !== ri));
-      
+      this.setState({songs:playlist});
       playlistUpdate();
     }.bind(this)
   },
