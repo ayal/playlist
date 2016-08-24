@@ -7,10 +7,21 @@ import {songs} from './song-list.json'
 
 import SortableMixin from 'sortablejs/react-sortable-mixin.js'
 
-// mutable data
-var allsongs = songs;
+import {observable, autorun} from "mobx";
 
-var AllSongs = React.createClass({
+import {observer} from "mobx-react";
+
+console.log('songs', typeof songs);
+
+// mutable, observable data
+var mutable = songs;
+class Data {
+  allsongs = observable(mutable) ;
+  playlist = observable([{artist: 'XXYYXX', title: 'About You', image: 'http://a4.mzstatic.com/us/r30/Music62/v4/75/b4/77/75b4779c-75a4-acae-ecb1-23cbcc843df9/cover170x170.jpeg'}]);
+}
+var data = new Data();
+
+var AllSongs = observer(React.createClass({
   mixins: [SortableMixin],
 
   sortableOptions: {
@@ -22,17 +33,16 @@ var AllSongs = React.createClass({
   },
 
   getInitialState: function() {
-    return { songs: allsongs };
+    return { songs: data.allsongs };
   },
 
   addSong: function(ri) {
     return function() {
-	var song = allsongs[ri];
-      playlist.push(song);
-      allsongs = allsongs.filter((x,i)=>(i !== ri));
-      this.setState({songs:allsongs});
-      
-      playlistUpdate();
+	var song = data.allsongs[ri];
+      data.playlist.push(song);
+      data.allsongs = data.allsongs.filter((x,i)=>(i !== ri));
+      this.setState({songs:data.allsongs});
+     
     }.bind(this)
   },
 
@@ -67,9 +77,7 @@ var AllSongs = React.createClass({
       </div>
     );
   }
-});
-
-var playlist = [{artist: 'XXYYXX', title: 'About You', image: 'http://a4.mzstatic.com/us/r30/Music62/v4/75/b4/77/75b4779c-75a4-acae-ecb1-23cbcc843df9/cover170x170.jpeg'}];
+}));
 
 var ApprovedSongs = React.createClass({
   mixins: [SortableMixin],
@@ -83,51 +91,38 @@ var ApprovedSongs = React.createClass({
 
   handleAdd: function (evt) {
     if (evt.from.id !== 'playlist-el' ) {
-      playlist.splice(evt.newIndex, 0, allsongs[evt.oldIndex]);
-      allsongs = allsongs.filter((x,i)=>(i !== evt.oldIndex));
-      playlistUpdate();
+      data.playlist.splice(evt.newIndex, 0, data.allsongs[evt.oldIndex]);
+      data.allsongs = data.allsongs.filter((x,i)=>(i !== evt.oldIndex));
     }
   },
   
   handleRemove: function (evt) {
-    if (playlist.length === 1) {
+    if (data.playlist.length === 1) {
       return;
     }
     
-    playlist = playlist.filter((x,i)=>(i !== evt.oldIndex));
-    playlistUpdate();
+    data.playlist = data.playlist.filter((x,i)=>(i !== evt.oldIndex));
   },
 
   handleSort: function (evt) {
     if (evt.from.id === 'playlist-el' ) {
-      var old = playlist[evt.oldIndex];
-      playlist = playlist.filter((x,i)=>(i !== evt.oldIndex));
-      playlist.splice(evt.newIndex, 0, old);
-      playlistUpdate();
+      var old = data.playlist[evt.oldIndex];
+      data.playlist = data.playlist.filter((x,i)=>(i !== evt.oldIndex));
+      data.playlist.splice(evt.newIndex, 0, old);
     }
   },
-
-
-  componentDidMount: function() {
-      window.playlistUpdate = function(theplaylist) {
-	  this.setState({songs:playlist})
-	  this.forceUpdate();
-    }.bind(this);
-  },
-
   
   getInitialState: function() {
-    return { songs: playlist };
+    return { songs: data.playlist };
   },
 
   remove: function(ri) {
     return function() {
-      if (playlist.length === 1) {
+      if (data.playlist.length === 1) {
 	return;
       }
-      playlist = playlist.filter((x,i)=>(i !== ri));
-      this.setState({songs:playlist});
-      playlistUpdate();
+      data.playlist = data.playlist.filter((x,i)=>(i !== ri));
+      this.setState({songs:data.playlist});
     }.bind(this)
   },
   
