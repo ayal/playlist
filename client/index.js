@@ -113,11 +113,7 @@ var ApprovedSongs = observer(React.createClass({
       </div>
       
       <div ref="song"  id="playlist-el" >{
-<<<<<<< HEAD
-	this.props.songs.map(function ({artist, title, image}, i) {
-=======
 	data.playlist.map(function ({artist, title, image}, i) {
->>>>>>> gh-pages
 	  var firstlast = ((i === that.props.songs.length - 1) ? 'last' : 'notlast');
 	  
           return (
