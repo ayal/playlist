@@ -26,22 +26,19 @@ var AllSongs = observer(React.createClass({
 
   sortableOptions: {
     ghostClass: "sortable-ghost",
+    chosenClass: "sortable-ghost",
     ref: "song",
     group: "shared",
     animation: 400,
     model: "songs"
   },
 
-  getInitialState: function() {
-    return { songs: data.allsongs };
-  },
 
   addSong: function(ri) {
     return function() {
-	var song = data.allsongs[ri];
+      var song = data.allsongs[ri];
       data.playlist.push(song);
-      data.allsongs = data.allsongs.filter((x,i)=>(i !== ri));
-      this.setState({songs:data.allsongs});
+      data.allsongs.replace(data.allsongs.filter((x,i)=>(i !== ri)));
      
     }.bind(this)
   },
@@ -59,7 +56,7 @@ var AllSongs = observer(React.createClass({
       <span className="line dotted"></span>
       </div>
       <div ref="song">{
-        this.state.songs.map(function ({artist, title, image}, i) {
+        this.props.songs.map(function ({artist, title, image}, i) {
           return (
 	    <div ref={i} className="song" key={i} onClick={that.addSong(i)}>
 	    <div>
@@ -79,57 +76,33 @@ var AllSongs = observer(React.createClass({
   }
 }));
 
-var ApprovedSongs = React.createClass({
+var ApprovedSongs = observer(React.createClass({
   mixins: [SortableMixin],
     sortableOptions: {
       ghostClass: "sortable-ghost",
+      chosenClass: "sortable-ghost",
       ref: "song",
       group: "shared",
       animation: 400,
       model: "songs",
   },
 
-  handleAdd: function (evt) {
-    if (evt.from.id !== 'playlist-el' ) {
-      data.playlist.splice(evt.newIndex, 0, data.allsongs[evt.oldIndex]);
-      data.allsongs = data.allsongs.filter((x,i)=>(i !== evt.oldIndex));
-    }
-  },
-  
-  handleRemove: function (evt) {
-    if (data.playlist.length === 1) {
-      return;
-    }
-    
-    data.playlist = data.playlist.filter((x,i)=>(i !== evt.oldIndex));
-  },
-
-  handleSort: function (evt) {
-    if (evt.from.id === 'playlist-el' ) {
-      var old = data.playlist[evt.oldIndex];
-      data.playlist = data.playlist.filter((x,i)=>(i !== evt.oldIndex));
-      data.playlist.splice(evt.newIndex, 0, old);
-    }
-  },
-  
-  getInitialState: function() {
-    return { songs: data.playlist };
-  },
 
   remove: function(ri) {
     return function() {
       if (data.playlist.length === 1) {
 	return;
       }
-      data.playlist = data.playlist.filter((x,i)=>(i !== ri));
-      this.setState({songs:data.playlist});
+      data.playlist.replace(data.playlist.filter((x,i)=>(i !== ri)));
+
     }.bind(this)
   },
+
   
   render: function() {
     var that = this;
 
-    console.log('PLAYLIST IS\n\n', this.state.songs.map((x)=>(x.artist + ' - ' + x.title)).join('\n'));
+    console.log('PLAYLIST IS\n\n', this.props.songs.map((x)=>(x.artist + ' - ' + x.title)).join('\n'));
     
     return (
       <div className="approved-songs song-list">
@@ -140,14 +113,14 @@ var ApprovedSongs = React.createClass({
       </div>
       
       <div ref="song"  id="playlist-el" >{
-	this.state.songs.map(function ({artist, title, image}, i) {
-	  var firstlast = ((i === that.state.songs.length - 1) ? 'last' : 'notlast');
+	data.playlist.map(function ({artist, title, image}, i) {
+	  var firstlast = ((i === that.props.songs.length - 1) ? 'last' : 'notlast');
 	  
           return (
 	    <div className={"song approved-song " + firstlast} ref={i} key={i} >
 	    <div>
 	    <span className="line"><span className="circle">{i + 1}</span></span>
-	    <span className={"icon-trash " + (that.state.songs.length === 1 ? 'transp' : '')} onClick={that.remove(i)} ></span>
+	    <span className={"icon-trash " + (that.props.songs.length === 1 ? 'transp' : '')} onClick={that.remove(i)} ></span>
 	    <span>{artist + ' - ' + title}</span>
 	    <span>
 	    <img src={image} />
@@ -161,7 +134,7 @@ var ApprovedSongs = React.createClass({
       </div>
     )
   }
-});
+}));
 
 
 
@@ -175,10 +148,10 @@ export class App extends React.Component {
     return (
       <div className="lists row">
       <div className="col col-md-6">
-      <AllSongs />
+      <AllSongs songs={data.allsongs} />
       </div>
       <div className="col col-md-6">
-      <ApprovedSongs />
+      <ApprovedSongs songs={data.playlist} />
       </div>
       </div>
     );
